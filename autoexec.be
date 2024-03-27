@@ -35,7 +35,7 @@ class TasmotaBlind : Driver
   def web_sensor()
 
     if webserver.has_arg("turn_max")
-      print("turn_max " +   webserver.has_arg("turn_max"))
+      print("turn_max " +   webserver.arg("turn_max"))
     end
  
   end
