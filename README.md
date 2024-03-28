@@ -22,10 +22,13 @@ Restart 1;
 
 ## tasmota template
 
-```
-{"NAME":"tasmota-blind","GPIO":[1,1,32,1,1,1,1,1,1,1,1,1,1,1,1,288,1,1,1,1,1,225,1,226,1,1,1,1,1,1,1,1,1,1,1,1],"FLAG":0,"BASE":1}
+https://github.com/berry-lang/berry/wiki/Chapter-7#math-module
 
-```
+https://github.com/berry-lang/berry
+
+https://github.com/arendst/Tasmota/blob/development/tasmota/berry/examples/web_handler_demo.be
+
+https://github.com/arendst/Tasmota/blob/development/tasmota/berry/gpio_viewer/debug_panel.be
 
 ## S2 mini
 
