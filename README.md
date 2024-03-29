@@ -1,5 +1,11 @@
 # tasmota IKEA-SCHOTTIS-BLIND
 
+### flash to tasmota32
+
+- https://tasmota.github.io/docs/ESP32/#esp32-s2
+- https://tasmota.github.io/docs/ESP32/#flashing
+- https://tasmota.github.io/install/
+
 ## S2 mini
 
 ![S2 mini](images/image-2.png)
