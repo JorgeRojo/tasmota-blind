@@ -3,15 +3,14 @@ import math
 import persist
 import string  
 import webserver
-
-print(">>>>>>>>>> tasmota-blind <<<<<<<<<<")  
-
-var TEMPLATE = '{"NAME":"tasmota-blind","GPIO":[0,0,34,33,32,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,224,0,225,0,0,0,0,0,0,0,0,0,0,0,0],"FLAG":0,"BASE":1}'
-var BUTTON_COUNTER = 'Button3'
-var BUTTON_COUNTER_DELAY = 1
-var DEFAULT_MAX_TURNS = 180
+ 
+var MODULE_NAME = 'IKEA-SCHOTTIS-BLIND'
+var TEMPLATE = '{"NAME":"' + MODULE_NAME + '","GPIO":[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,288,0,0,0,0,0,224,0,225,0,0,0,0,0,160,0,0,0,0,0,0],"FLAG":0,"BASE":1}'
+var SWITCH = 'Switch1'
 var RELAY_UP = 'POWER1'
 var RELAY_DOWN = 'POWER2'
+var DEFAULT_MAX_TURNS = 180
+
 
 
 class TasmotaBlind : Driver
@@ -35,7 +34,8 @@ class TasmotaBlind : Driver
 
   def off_all() 
     tasmota.set_power(0, false) 
-    tasmota.set_power(1, false) 
+    tasmota.set_power(1, false)
+    tasmota.cmd(SWITCH + ' 0') 
   end
 
   def check_turns()
@@ -77,24 +77,47 @@ class TasmotaBlind : Driver
 
   def has_template()
     var power_size =  tasmota.get_power().size() 
-     return power_size == 2  
+    return power_size == 2  
   end
 
   def init()
-    if self.has_template() 
-      tasmota.cmd("SetOption32 " + str(BUTTON_COUNTER_DELAY))
-      tasmota.cmd("SetOption73 0")
-      tasmota.cmd("Interlock ON") 
-      tasmota.cmd("Backlog ButtonMode 0")
-      tasmota.cmd("ButtonTopic 0")
-      tasmota.cmd("WebButton1 UP ▲")
-      tasmota.cmd("WebButton2 DOWN ▼")
+    self.turns_max = int(persist.find("turns_max", str(DEFAULT_MAX_TURNS)))
+    self.turns_position = int(persist.find("turns_position", "0"))
+
+    var current_module = tasmota.cmd("Module")['Module'].find('0')
+    var is_module = current_module == MODULE_NAME
+
+    if is_module
       self.off_all()
-      self.turns_max = int(persist.find("turns_max", str(DEFAULT_MAX_TURNS)))
-      self.turns_position = int(persist.find("turns_position", "0"))
-     else 
-      tasmota.cmd('Template ' + TEMPLATE )
-      tasmota.cmd("Restart 1")
+
+      # set switch 1 to report state, not toggle
+      tasmota.cmd("SwitchMode1 1");
+      # disconnect switches from relays
+      tasmota.cmd("SetOption114 1");
+      # dont report switches state
+      tasmota.cmd("SwitchTopic 0");
+
+      # commutate relays to activate only one and automatically turn off the other
+      tasmota.cmd("Interlock ON") 
+
+      # device texts 
+      var up = 'UP ▲'
+      var down = 'DOWN ▼'
+
+
+      var host_name = tasmota.cmd("status 5")['StatusNET']['Hostname']
+      var device_name = MODULE_NAME + '-' + host_name
+
+      tasmota.cmd("DeviceName " + device_name)
+      
+      tasmota.cmd("FriendlyName1 " + device_name + ' ' + up)
+      tasmota.cmd("WebButton1 " + up)
+
+      tasmota.cmd("FriendlyName2 " + device_name + ' ' + down)
+      tasmota.cmd("WebButton2 " + down)
+    else 
+      tasmota.cmd('Template ' + TEMPLATE)
+      tasmota.cmd('Module 0')
     end
   end
  
@@ -136,10 +159,15 @@ class TasmotaBlind : Driver
 
 end
 
-var tasmota_blind = TasmotaBlind()
+var blind = TasmotaBlind()
+tasmota.add_driver(blind)
 
-tasmota.add_driver(tasmota_blind)
+# rules --------------------------
+tasmota.remove_rule(RELAY_UP)
+tasmota.add_rule(RELAY_UP, def () blind.check_turns() end )
 
-tasmota.add_rule(RELAY_UP, def () tasmota_blind.check_turns() end )
-tasmota.add_rule(RELAY_DOWN, def () tasmota_blind.check_turns() end )
-tasmota.add_rule(BUTTON_COUNTER, def () tasmota_blind.set_turn() end )
+tasmota.remove_rule(RELAY_DOWN)
+tasmota.add_rule(RELAY_DOWN, def () blind.check_turns() end ) 
+
+tasmota.remove_rule(SWITCH + "#State=1")
+tasmota.add_rule(SWITCH + "#State=1", def () blind.set_turn() end)
