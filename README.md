@@ -5,6 +5,9 @@
 - https://tasmota.github.io/docs/ESP32/#esp32-s2
 - https://tasmota.github.io/docs/ESP32/#flashing
 - https://tasmota.github.io/install/
+- https://tasmota.github.io/docs/Blinds-and-Shutters
+- https://tasmota.github.io/docs/Commands/#shutters
+- https://tasmota.github.io/docs/PWM-dimmer-switch/#pwm-dimmer-operation
 
 ## S2 mini
 
