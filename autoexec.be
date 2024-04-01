@@ -1,3 +1,5 @@
+# https://github.com/arendst/Tasmota/tree/development/tasmota/berry
+
 import mqtt
 import math  
 import persist
@@ -19,6 +21,7 @@ var DEFAULT_MAX_TURNS = 180
 
 class TasmotaBlind : Driver
   var turns_max
+  var turns_range
   var turns_position
   var relay_direction_check_time
   
@@ -63,6 +66,10 @@ class TasmotaBlind : Driver
     tasmota.cmd("PowerOnState 4")
   end
 
+  def set_turn_range(turns_position, turns_max) 
+    self.turns_range = int((int(turns_position) * 100) / int(turns_max))
+  end
+
   def set_turn()
     var is_up = tasmota.get_power(0)
     var is_down = tasmota.get_power(1)
@@ -90,11 +97,12 @@ class TasmotaBlind : Driver
       print(">>>> IS FULL DOWN") 
     end
   end
-
+ 
   def init()
     self.turns_max = int(persist.find("turns_max", str(DEFAULT_MAX_TURNS)))
     self.turns_position = int(persist.find("turns_position", "0"))
     self.relay_direction_check_time = tasmota.millis()
+    self.set_turn_range(self.turns_position, self.turns_max) 
 
     var current_module = tasmota.cmd("Module")['Module'].find('0')
     var is_module = current_module == MODULE_NAME
@@ -119,6 +127,7 @@ class TasmotaBlind : Driver
       # device texts  
       tasmota.cmd("WebButton1 " + TEXT_UP) 
       tasmota.cmd("WebButton2 " + TEXT_DOWN)
+      
     else 
       tasmota.cmd('Template ' + TEMPLATE)
       tasmota.cmd('Module 0')
@@ -129,53 +138,67 @@ class TasmotaBlind : Driver
   end
  
   def web_add_main_button()
-    webserver.content_send("<br/><br/>" +
-      "<table width='100%'>" + 
-        "<tr>"+ 
-          "<td width='50%'>" +
-            "<p>" +
-              "<label for='turns_position'>"+
-                "Current turn:" + 
-              "</label>" +
-            "</p>" +
-            "<input id='turns_position' type='number' min='0' max='6000' onChange='la(\"&turns_position=\" + value);' value='" + str(self.turns_position) + "' />" +
-          "</td>" +   
-          "<td width='50%'>" +
-            "<p>" +
-              "<label for='turns_max'>"+ 
-                "Máximum turns:" + 
-              "</label>" +
-            "</p>" +
-            "<input id='turns_max' type='number' min='1' max='6000' onChange='la(\"&turns_max=\" + value);' value='" + str(self.turns_max) + "' />" +
-          "</td>" +   
-        "</tr>" +  
-      "</table>"+
+    webserver.content_send("<br/><br/>"
+      "<table width='100%'>"
+        "<tr>"
+          "<td colspan='2'>"
+            "<table width='100%'>"
+              "<tr>"
+                "<td><label for='turns_range'>Open</label></td>"
+                "<td style='text-align: right;'><label for='turns_range'>Close</label></td>"
+              "</tr>"
+            "</table>"
+            "<input id='turns_range' type='range' min='0' max='100' value='" + str(self.turns_range) + "' oninput='la(\"&turns_range=\" + value);' />"
+          "</td>"
+        "</tr>"
+        "<tr>"
+          "<td width='50%'>"
+            "<p><label for='turns_position'>Initial turn:</label></p>"
+            "<input id='turns_position' type='number' min='0' max='6000' onChange='la(\"&turns_position=\" + value);' value='" + str(self.turns_position) + "' />"
+          "</td>"
+          "<td width='50%'>"
+            "<p><label for='turns_max'>Máximum turns:</label></p>"
+            "<input id='turns_max' type='number' min='1' max='6000' onChange='la(\"&turns_max=\" + value);' value='" + str(self.turns_max) + "' />"
+          "</td>"
+        "</tr>"
+      "</table>"
       "<br/><br/>"  
     )
   end 
 
   def web_sensor()
+    if webserver.has_arg("turns_range")
+      var turns_position_to_go = int((int(webserver.arg("turns_range")) * self.turns_max ) / 100)
+      print(">>>> turns_position_to_go", turns_position_to_go)  
+    end 
+
     if webserver.has_arg("turns_max")
       self.set_turns_max(webserver.arg("turns_max"))
     end  
 
     if webserver.has_arg("turns_position")
       self.set_turns_position(webserver.arg("turns_position"))
-    end  
-  end 
+    end
+
+
+    var current_turn = str(self.turns_position) + '/' +  str(self.turns_max)
+    webserver.content_send(format("{s}Current turn{m}%s{e}", current_turn))
+    tasmota.publish("stat/" + MQTT_TOPIC + "/SENSOR", string.format("{\"CurrentTurn\": \"%s\"}", current_turn) ) 
+
+    # mqtt.publish("stat/" + MQTT_TOPIC + "/counter1", current_turn)
+  end
 
 end
 
 var blind = TasmotaBlind()
 tasmota.add_driver(blind)
 
-# -------------------------- 
-
+# rules and subcirbers
 mqtt.unsubscribe(MQTT_TOPIC_UP)
 mqtt.subscribe(MQTT_TOPIC_UP, def (topic) blind.relay_direction_check(topic) end)
 
 mqtt.unsubscribe(MQTT_TOPIC_DOWN)
 mqtt.subscribe(MQTT_TOPIC_DOWN, def (topic) blind.relay_direction_check(topic) end)
- 
+
 tasmota.remove_rule(SWITCH + "#State=1")
 tasmota.add_rule(SWITCH + "#State=1", def () blind.set_turn() end)
