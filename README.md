@@ -1,5 +1,7 @@
 # tasmota IKEA-SCHOTTIS-BLIND
 
+IoT blind software and hardware development based on Tasmota.
+
 ### flash to tasmota32
 
 - https://tasmota.github.io/docs/ESP32/#esp32-s2
@@ -9,27 +11,34 @@
 - https://tasmota.github.io/docs/Commands/#shutters
 - https://tasmota.github.io/docs/PWM-dimmer-switch/#pwm-dimmer-operation
 
+## Schema
+
+![Schema](readme_images/blind_schema.jpg)
+Set the voltage regulator to 3.6V
+
+## Increase wifi signal
+
+![Schema](readme_images/increase_wifi_signal.jpg)
+
 ## S2 mini
 
-![S2 mini](images/image-2.png)
+![S2 mini](readme_images/image-2.png)
 https://www.wemos.cc/en/latest/s2/s2_mini.html#pin
 
 ## COMPONENTS
 
-| Component                | Price      | Link                                                                                    | Image                                           |
-| ------------------------ | ---------- | --------------------------------------------------------------------------------------- | ----------------------------------------------- |
-| Micro-controller esp32s2 | 0,99€      | [aliexpress](https://es.aliexpress.com/item/1005006469381084.html)                      | ![Micro-controller esp32s2](images/image-6.png) |
-| Voltage regulator        | 0,46€      | [aliexpress](https://es.aliexpress.com/item/1005005870392716.html)                      | ![Voltage regulator](images/image-5.png)        |
-| Motor controller HG7881  | 0,99€      | [aliexpress](https://es.aliexpress.com/item/1005006126762079.html)                      | ![Motor controller HG7881](images/image-7.png)  |
-| Micro switcher           | 0,95€      | [aliexpress](https://es.aliexpress.com/item/1005003536527857.html)                      | ![Micro switcher](images/image-8.png)           |
-| Rotor 200RPM 12V         | 2,29€      | [aliexpress](https://es.aliexpress.com/item/1005004045108485.html)                      | ![Rotor 200RPM 12V](images/image-9.png)         |
-| Power supply 5A 12V      | 4,43€      | [aliexpress](https://es.aliexpress.com/item/1005005626231303.html)                      | ![Power supply 5A 12V](images/image-10.png)     |
-| Blockout pleated blink   | 6,99€      | [IKEA](https://www.ikea.com/es/es/p/schottis-estor-plisado-opaco-gris-oscuro-90369507/) | ![Estor plisado opaco](images/image-11.png)     |
-| Aluminum profile         | 1,88€      | [manomano](https://www.manomano.es/p/pa-24801490)                                       | ![Perfil de Aluminio](images/image-13.png)      |
-| Nylon rope 1mm           | 1,84€      | [aliexpress](https://es.aliexpress.com/item/1005001826069499.html)                      | ![Cuerdad de nylon 1mm](images/image-14.png)    |
-| Case                     | 1,90€      | [aliexpress](https://es.aliexpress.com/item/1005002656761229.html)                      | ![Case](images/image-15.png)                    |
-| Epoxy paste              | 3,10€      | [aliexpress](https://es.aliexpress.com/item/1005006124394766.html)                      | ![Epoxy paste](images/image-16.png)             |
-| Total:                   | **25,82€** |                                                                                         |                                                 |
+| Component                | Link                                                                                    | Image                                                  |
+| ------------------------ | --------------------------------------------------------------------------------------- | ------------------------------------------------------ |
+| Micro-controller esp32s2 | [aliexpress](https://es.aliexpress.com/item/1005006469381084.html)                      | ![Micro-controller esp32s2](readme_images/image-6.png) |
+| Voltage regulator        | [aliexpress](https://es.aliexpress.com/item/1005005870392716.html)                      | ![Voltage regulator](readme_images/image-5.png)        |
+| Motor controller HG7881  | [aliexpress](https://es.aliexpress.com/item/1005006126762079.html)                      | ![Motor controller HG7881](readme_images/image-7.png)  |
+| Rotor 200RPM 12V         | [aliexpress](https://es.aliexpress.com/item/1005004045108485.html)                      | ![Rotor 200RPM 12V](readme_images/image-9.png)         |
+| Power supply 5A 12V      | [aliexpress](https://es.aliexpress.com/item/1005005626231303.html)                      | ![Power supply 5A 12V](readme_images/image-10.png)     |
+| Blockout pleated blink   | [IKEA](https://www.ikea.com/es/es/p/schottis-estor-plisado-opaco-gris-oscuro-90369507/) | ![Estor plisado opaco](readme_images/image-11.png)     |
+| Aluminum profile         | [manomano](https://www.manomano.es/p/pa-24801490)                                       | ![Perfil de Aluminio](readme_images/image-13.png)      |
+| Nylon rope 1mm           | [aliexpress](https://es.aliexpress.com/item/1005001826069499.html)                      | ![Cuerdad de nylon 1mm](readme_images/image-14.png)    |
+| Case                     | [aliexpress](https://es.aliexpress.com/item/1005002656761229.html)                      | ![Case](readme_images/image-15.png)                    |
+| Epoxy paste              | [aliexpress](https://es.aliexpress.com/item/1005006124394766.html)                      | ![Epoxy paste](readme_images/image-16.png)             |
 
 ## Copilot helped me
 
